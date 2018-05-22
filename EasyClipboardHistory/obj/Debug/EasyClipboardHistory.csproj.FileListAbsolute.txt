@@ -1,0 +1,10 @@
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\bin\Debug\EasyClipboardHistory.exe.config
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\bin\Debug\EasyClipboardHistory.exe
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\bin\Debug\EasyClipboardHistory.pdb
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\obj\Debug\EasyClipboardHistory.csprojResolveAssemblyReference.cache
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\obj\Debug\EasyClipboardHistory.Main.resources
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\obj\Debug\EasyClipboardHistory.Properties.Resources.resources
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\obj\Debug\EasyClipboardHistory.csproj.GenerateResource.Cache
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\obj\Debug\EasyClipboardHistory.csproj.CoreCompileInputs.cache
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\obj\Debug\EasyClipboardHistory.exe
+C:\Users\user\Source\Repos\EasyClipboardHistory\EasyClipboardHistory\obj\Debug\EasyClipboardHistory.pdb

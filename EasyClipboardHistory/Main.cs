@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,13 +17,35 @@ namespace EasyClipboardHistory
 {
     public partial class Main : Form
     {
-        public static ToolStripItemCollection HistoryToolStripCollection;
         private MyClipboardViewer viewer;
 
         private IntPtr ForehWnd = IntPtr.Zero;
-        private bool IsEndFlag = false;
 
+        private bool IsEndFlag = false;
+        private bool isContextMenuStripOpen = false;
+
+        /// <summary>表示する文字数</summary>
+    
         const int DISPLAY_LENGTH = 40;
+
+        /// <summary>（定型時使用）改行コード</summary>
+        const string KAIGYO_CODE = @"[\n]";
+
+        private bool isFixedFormExists = false;
+
+        /// <summary>データ件数をマイナス</summary>
+        public int CountMinus {
+            get{
+                var returnValue = 0;
+                if (isFixedFormExists == true)
+                {
+                    returnValue += 1;
+                }
+                return returnValue;
+            }
+        }
+
+        ToolStripMenuItem itemFixedForm = null;
 
         public Main()
         {
@@ -30,10 +53,6 @@ namespace EasyClipboardHistory
             viewer = new MyClipboardViewer(this);
 
             InitializeComponent();
-
-            //アイテムを連動
-            HistoryToolStripCollection = this.contextMenuStrip1.Items; //= m_history.Items;
-
 
             //クリップボード イベントハンドラを登録
             viewer.ClipboardHandler += this.OnClipBoardChanged;
@@ -57,6 +76,13 @@ namespace EasyClipboardHistory
 
                 if (ts.TotalMilliseconds <= doubleClickTime)
                 {
+
+                    //すでに開いている場合は無視
+                    if (isContextMenuStripOpen == true)
+                    {
+                        return;
+                    }
+
                     //フォーカス位置の取得
                     ForehWnd = APIList.GetForegroundWindow();
                     var current = APIList.GetCurrentThreadId();
@@ -99,7 +125,7 @@ namespace EasyClipboardHistory
             else if (e.UpDown == HongliangSoft.Utilities.Gui.KeyboardUpDown.Up && e.KeyCode == Keys.Escape)
             {
                 //キャンセルの処理
-                if (IsContextMenuStripOpen == true)
+                if (isContextMenuStripOpen == true)
                 {
                     this.contextMenuStrip1.Close();
                 }
@@ -109,22 +135,48 @@ namespace EasyClipboardHistory
         private void Main_Load(object sender, EventArgs e)
         {
             this.notifyIcon1.Icon = this.Icon;
-            this.notifyIcon1.BalloonTipText = "shiftキーダブルクリック\n選択でクリップボードにコピー（貼付）";
+            this.notifyIcon1.BalloonTipText = "（左）shiftキーダブルクリック\n選択でクリップボードにコピー（貼付）";
             this.notifyIcon1.BalloonTipTitle = "";
             this.notifyIcon1.Text = "";
 
             this.notifyIcon1.ShowBalloonTip(500);
 
             this.txtRirekiCount.Text = Properties.Settings.Default.RirekiCount.ToString();
-        }
 
-        private void Main_SizeChanged(object sender, EventArgs e)
-        {
-            if (this.WindowState == FormWindowState.Minimized)
+            txtFixedFormRei.BackColor = this.BackColor;
+            txtFixedFormRei.Text = "改行は " + KAIGYO_CODE + " をセット";
+
+            //履歴データの復元
+            if (Properties.Settings.Default.RirekiKeyData == null)
             {
-                this.Visible = false;
-                this.Opacity = 0;
+                Properties.Settings.Default.RirekiKeyData = new System.Collections.Specialized.StringCollection();
             }
+
+            if (Properties.Settings.Default.RirekiTagData == null)
+            {
+                Properties.Settings.Default.RirekiTagData = new System.Collections.Specialized.StringCollection();
+            }
+
+            if (Properties.Settings.Default.RirekiKeyData.Count > 0) { 
+                this.contextMenuStrip1.Items.Clear();
+                for (var i = 0; i < Properties.Settings.Default.RirekiKeyData.Count ; i++)
+                {
+                    try
+                    {
+                        var item = new ToolStripMenuItem();
+
+                        item.Text = Properties.Settings.Default.RirekiKeyData[i];
+                        item.Tag = Properties.Settings.Default.RirekiTagData[i];
+
+                        this.contextMenuStrip1.Items.Add(item);
+                    }
+                    catch { }
+                }
+            }
+
+            //定型のセット
+            saveFixedFormValue(true);
+          
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
@@ -133,7 +185,24 @@ namespace EasyClipboardHistory
             {
                 e.Cancel = true;
                 this.Hide();
+                return;
             }
+
+            //履歴の保存
+            Properties.Settings.Default.RirekiKeyData.Clear();
+            Properties.Settings.Default.RirekiTagData.Clear();
+
+            for (var i = 0; i < this.contextMenuStrip1.Items.Count ; i++)
+            {
+                ToolStripItem item = this.contextMenuStrip1.Items[i];
+                if (item.Tag != null)
+                {
+                    Properties.Settings.Default.RirekiKeyData.Add(item.Text);
+                    Properties.Settings.Default.RirekiTagData.Add(item.Tag.ToString());
+                }
+            }
+            
+            Properties.Settings.Default.Save();
         }
 
         private void Main_Shown(object sender, EventArgs e)
@@ -144,88 +213,62 @@ namespace EasyClipboardHistory
 
         private void OnClipBoardChanged(object sender, ClipboardEventArgs args)
         {
+
             if (Clipboard.ContainsText(System.Windows.Forms.TextDataFormat.Text))
             {
                 var clipText = (String)System.Windows.Forms.Clipboard.GetData(System.Windows.Forms.DataFormats.StringFormat);
 
-                var dispText = clipText.Trim().Replace("\r", "").Replace("\n", "").Replace("\t", "");
-                
-                if (dispText.Length == 0)
+                var item = getClipTextItem(clipText);
+
+                if (item == null)
                 {
                     return;
                 }
 
-                //ポップアップに表示する文字数
-                if (dispText.Length > DISPLAY_LENGTH)
+                if (this.contextMenuStrip1.Items.Count > 0 && this.contextMenuStrip1.Items[0].Tag !=null)
                 {
-                    dispText = dispText.Substring(0, DISPLAY_LENGTH);
-                }
-
-                var item = new ToolStripMenuItem();
-
-                item.Text = dispText;
-                item.Tag = clipText;
-
-                if (HistoryToolStripCollection.Count > 0)
-                {
-                    if ((String)(HistoryToolStripCollection[0].Tag) == (String)clipText)
+                    if ((String)(this.contextMenuStrip1.Items[0].Tag) == (String)clipText)
                     {
                         return;
                     }
-
                 }
-                HistoryToolStripCollection.Insert(0, item);
+                this.contextMenuStrip1.Items.Insert(0, item);
 
                 //履歴数を超えた場合の削除処理
                 int MaxCountData = Properties.Settings.Default.RirekiCount;
-                if (HistoryToolStripCollection.Count > MaxCountData)
+                if (this.contextMenuStrip1.Items.Count - this.CountMinus > MaxCountData)
                 {
-                    for (int index = HistoryToolStripCollection.Count - 1; index >= MaxCountData; index--)
+                    for (int index = this.contextMenuStrip1.Items.Count - 1; index >= MaxCountData; index--)
                     {
-                        HistoryToolStripCollection.RemoveAt(index);
+                        this.contextMenuStrip1.Items.RemoveAt(index);
                     }
                 }
             }
         }
 
-        bool IsContextMenuStripOpen = false;
         private void contextMenuStrip1_Opened(object sender, EventArgs e)
         {
-            IsContextMenuStripOpen = true;
+            isContextMenuStripOpen = true;
         }
 
         private void contextMenuStrip1_Closed(object sender, ToolStripDropDownClosedEventArgs e)
         {
-            if (ForehWnd != IntPtr.Zero)
-            {
-                APIList.SetActiveWindow(ForehWnd);
-                if (IsClipCopy == true)
-                {
-                    Thread.Sleep(50);
-                    
-                    //貼付処理
-                    //SendKeys.Send("^V");
-                    var VK_CONTROL = 0x11;
-                    var KEYEVENTF_KEYDOWN = 0x0; 
-                    var KEYEVENTF_KEYUP = 0x2;
-                    APIList.keybd_event((byte)VK_CONTROL, (byte)0, (uint)KEYEVENTF_KEYDOWN, (UIntPtr)0);
-                    APIList.keybd_event((byte)Keys.V, (byte)0, (uint)KEYEVENTF_KEYDOWN, (UIntPtr)0);
-                    Thread.Sleep(50);
-                    APIList.keybd_event((byte)Keys.V, (byte)0, (uint)KEYEVENTF_KEYUP, (UIntPtr)0);
-                    APIList.keybd_event((byte)VK_CONTROL, (byte)0, (uint)KEYEVENTF_KEYUP, (UIntPtr)0);
-                }
-            }
-
-            IsContextMenuStripOpen = false;
-            IsClipCopy = false;
-
+            isContextMenuStripOpen = false;
         }
 
-        private bool IsClipCopy = false;
+        //private bool IsClipCopy = false;
         private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            System.Windows.Forms.Clipboard.SetText((string)(((ToolStripMenuItem)(e.ClickedItem)).Tag));
-            IsClipCopy = true;
+            var tag =((ToolStripMenuItem)(e.ClickedItem)).Tag;
+            if (tag == null)
+            {
+                return;
+            }
+
+            var text = (string)tag;
+            this.contextMenuStrip1.Items.Remove((ToolStripMenuItem)(e.ClickedItem));    //削除
+
+            setClipboard(text);
             //this.notifyIcon1.BalloonTipText = "クリップボードにコピーしました。";
             //this.notifyIcon1.ShowBalloonTip(50);
         }
@@ -233,19 +276,24 @@ namespace EasyClipboardHistory
         private void toolStripMenuItemEnd_Click(object sender, EventArgs e)
         {
             IsEndFlag = true;
-            Properties.Settings.Default.Save();
             Application.Exit();
         }
 
+        private void toolStripMenuItemSetting_Click(object sender, EventArgs e)
+        {
+            notifyIcon1_DoubleClick(sender, e);
+        }
+
+        /// <summary>タスクトレイ</summary>
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
         {
             this.Opacity = 100;
             this.Visible = true;
+            this.WindowState = FormWindowState.Normal;
 
-            if (this.WindowState == FormWindowState.Minimized)
-            {
-                this.WindowState = FormWindowState.Normal;
-            }
+            //this.Update();
+
+            this.Activate();
         }
 
         private void txtRirekiCount_TextChanged(object sender, EventArgs e)
@@ -264,5 +312,152 @@ namespace EasyClipboardHistory
                 Properties.Settings.Default.RirekiCount = 20;
             }
         }
+
+
+        private void setClipboard(string text)
+        {
+            System.Windows.Forms.Clipboard.SetText(text);
+
+            if (ForehWnd != IntPtr.Zero)
+            {
+                this.contextMenuStrip1.Hide();
+
+                APIList.SetActiveWindow(ForehWnd);
+                Thread.Sleep(50);
+
+                //貼付処理
+                //SendKeys.Send("^V");
+                var VK_CONTROL = 0x11;
+                var KEYEVENTF_KEYDOWN = 0x0;
+                var KEYEVENTF_KEYUP = 0x2;
+                APIList.keybd_event((byte)VK_CONTROL, (byte)0, (uint)KEYEVENTF_KEYDOWN, (UIntPtr)0);
+                APIList.keybd_event((byte)Keys.V, (byte)0, (uint)KEYEVENTF_KEYDOWN, (UIntPtr)0);
+                Thread.Sleep(50);
+                APIList.keybd_event((byte)Keys.V, (byte)0, (uint)KEYEVENTF_KEYUP, (UIntPtr)0);
+                APIList.keybd_event((byte)VK_CONTROL, (byte)0, (uint)KEYEVENTF_KEYUP, (UIntPtr)0);
+
+            }
+        }
+
+        private void btnFixedFormAdd_Click(object sender, EventArgs e)
+        {
+            if (this.txtFixedForm.Text.Equals("") == false)
+            {
+                for (var i = 0; i < this.lstFixedForm.Items.Count; i++)
+                {
+                    if (this.txtFixedForm.Text.Equals(this.lstFixedForm.Items[i].ToString()))
+                    {
+                        MessageBox.Show("既に追加済です。");
+                        return;
+                    }
+                }
+                this.lstFixedForm.Items.Add(this.txtFixedForm.Text);
+                saveFixedFormValue(false);
+            }
+        }
+
+        private void btnFixedFormDelete_Click(object sender, EventArgs e)
+        {
+            this.lstFixedForm.Items.Remove(this.lstFixedForm.SelectedItem);
+            saveFixedFormValue(false);
+        }
+
+        private void saveFixedFormValue(bool firstFlag )
+        {
+
+            //最初はListboxに追加するだけ
+            if (firstFlag == true)
+            {
+                if (Properties.Settings.Default.RirekiFixedForm == null)
+                {
+                    Properties.Settings.Default.RirekiFixedForm = new System.Collections.Specialized.StringCollection();
+                }
+                this.lstFixedForm.Items.Clear();
+                this.lstFixedForm.Items.AddRange(Properties.Settings.Default.RirekiFixedForm.OfType<object>().ToArray<object>());
+
+            }
+            else
+            {
+                Properties.Settings.Default.RirekiFixedForm.Clear();
+                Properties.Settings.Default.RirekiFixedForm.AddRange(this.lstFixedForm.Items.OfType<string>().ToArray<string>());
+            }
+
+
+            if (Properties.Settings.Default.RirekiFixedForm.Count == 0)
+            {
+                isFixedFormExists = false;
+
+                if (itemFixedForm != null)
+                {
+                    this.contextMenuStrip1.Items.Remove(itemFixedForm);
+                    itemFixedForm = null;
+                }
+            }
+            else {
+                isFixedFormExists = true;
+
+                if (itemFixedForm == null)
+                {
+                    itemFixedForm = new ToolStripMenuItem();
+                    itemFixedForm.Text = "（定型）";
+
+                    this.contextMenuStrip1.Items.Add(itemFixedForm);
+                }
+
+                itemFixedForm.DropDownItems.Clear();
+
+                for (var i = 0; i < Properties.Settings.Default.RirekiFixedForm.Count; i++)
+                {
+                    var value = Properties.Settings.Default.RirekiFixedForm[i];
+
+                    value = value.Replace(KAIGYO_CODE, "\n");
+                    
+                    var item = getClipTextItem(value);
+
+                    if (item == null)
+                    {
+                        continue;
+                    }
+
+                    item.Click += (parasender, parae) =>
+                    {
+                        var tag = ((ToolStripMenuItem)(parasender)).Tag;
+                        if (tag == null)
+                        {
+                            return;
+                        }
+                        var text = (string)(tag);
+                        setClipboard(text);
+                    };
+
+                    itemFixedForm.DropDownItems.Add(item);
+                }
+            }
+        }
+
+        private ToolStripMenuItem getClipTextItem(string clipText)
+        {
+            var dispText = clipText.Trim().Replace("\r", "").Replace("\n", "").Replace("\t", "");
+
+            if (dispText.Length == 0)
+            {
+                return null;
+            }
+
+            //ポップアップに表示する文字数（本来は全角半角考慮したほうがよい・・）
+            if (dispText.Length > DISPLAY_LENGTH)
+            {
+                dispText = dispText.Substring(0, DISPLAY_LENGTH);
+            }
+
+            var item = new ToolStripMenuItem();
+
+            item.Text = dispText;
+            item.Tag = clipText;
+
+            return item;
+        }
+
+ 
     }
 }

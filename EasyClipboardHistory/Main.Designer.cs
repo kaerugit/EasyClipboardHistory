@@ -36,6 +36,13 @@
             this.toolStripMenuItemEnd = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.txtRirekiCount = new System.Windows.Forms.TextBox();
+            this.txtFixedForm = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.btnFixedFormAdd = new System.Windows.Forms.Button();
+            this.lstFixedForm = new System.Windows.Forms.ListBox();
+            this.btnFixedFormDelete = new System.Windows.Forms.Button();
+            this.txtFixedFormRei = new System.Windows.Forms.TextBox();
+            this.toolStripMenuItemSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.keyboardHook1 = new HongliangSoft.Utilities.Gui.KeyboardHook();
             this.contextMenuStripEnd.SuspendLayout();
             this.SuspendLayout();
@@ -63,14 +70,15 @@
             // contextMenuStripEnd
             // 
             this.contextMenuStripEnd.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemSetting,
             this.toolStripMenuItemEnd});
             this.contextMenuStripEnd.Name = "contextMenuStripEnd";
-            this.contextMenuStripEnd.Size = new System.Drawing.Size(101, 26);
+            this.contextMenuStripEnd.Size = new System.Drawing.Size(153, 70);
             // 
             // toolStripMenuItemEnd
             // 
             this.toolStripMenuItemEnd.Name = "toolStripMenuItemEnd";
-            this.toolStripMenuItemEnd.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItemEnd.Size = new System.Drawing.Size(152, 22);
             this.toolStripMenuItemEnd.Text = "終了";
             this.toolStripMenuItemEnd.Click += new System.EventHandler(this.toolStripMenuItemEnd_Click);
             // 
@@ -87,9 +95,69 @@
             // 
             this.txtRirekiCount.Location = new System.Drawing.Point(92, 9);
             this.txtRirekiCount.Name = "txtRirekiCount";
-            this.txtRirekiCount.Size = new System.Drawing.Size(152, 19);
+            this.txtRirekiCount.Size = new System.Drawing.Size(99, 19);
             this.txtRirekiCount.TabIndex = 3;
             this.txtRirekiCount.TextChanged += new System.EventHandler(this.txtRirekiCount_TextChanged);
+            // 
+            // txtFixedForm
+            // 
+            this.txtFixedForm.Location = new System.Drawing.Point(92, 43);
+            this.txtFixedForm.Name = "txtFixedForm";
+            this.txtFixedForm.Size = new System.Drawing.Size(99, 19);
+            this.txtFixedForm.TabIndex = 5;
+            // 
+            // label2
+            // 
+            this.label2.Location = new System.Drawing.Point(12, 43);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(74, 19);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "定型";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // btnFixedFormAdd
+            // 
+            this.btnFixedFormAdd.Location = new System.Drawing.Point(197, 41);
+            this.btnFixedFormAdd.Name = "btnFixedFormAdd";
+            this.btnFixedFormAdd.Size = new System.Drawing.Size(75, 23);
+            this.btnFixedFormAdd.TabIndex = 6;
+            this.btnFixedFormAdd.Text = "追加";
+            this.btnFixedFormAdd.UseVisualStyleBackColor = true;
+            this.btnFixedFormAdd.Click += new System.EventHandler(this.btnFixedFormAdd_Click);
+            // 
+            // lstFixedForm
+            // 
+            this.lstFixedForm.FormattingEnabled = true;
+            this.lstFixedForm.ItemHeight = 12;
+            this.lstFixedForm.Location = new System.Drawing.Point(14, 75);
+            this.lstFixedForm.Name = "lstFixedForm";
+            this.lstFixedForm.Size = new System.Drawing.Size(258, 88);
+            this.lstFixedForm.TabIndex = 7;
+            // 
+            // btnFixedFormDelete
+            // 
+            this.btnFixedFormDelete.Location = new System.Drawing.Point(14, 169);
+            this.btnFixedFormDelete.Name = "btnFixedFormDelete";
+            this.btnFixedFormDelete.Size = new System.Drawing.Size(75, 23);
+            this.btnFixedFormDelete.TabIndex = 8;
+            this.btnFixedFormDelete.Text = "削除";
+            this.btnFixedFormDelete.UseVisualStyleBackColor = true;
+            this.btnFixedFormDelete.Click += new System.EventHandler(this.btnFixedFormDelete_Click);
+            // 
+            // txtFixedFormRei
+            // 
+            this.txtFixedFormRei.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtFixedFormRei.Location = new System.Drawing.Point(95, 173);
+            this.txtFixedFormRei.Name = "txtFixedFormRei";
+            this.txtFixedFormRei.Size = new System.Drawing.Size(99, 12);
+            this.txtFixedFormRei.TabIndex = 9;
+            // 
+            // toolStripMenuItemSetting
+            // 
+            this.toolStripMenuItemSetting.Name = "toolStripMenuItemSetting";
+            this.toolStripMenuItemSetting.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemSetting.Text = "設定";
+            this.toolStripMenuItemSetting.Click += new System.EventHandler(this.toolStripMenuItemSetting_Click);
             // 
             // keyboardHook1
             // 
@@ -100,6 +168,12 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
+            this.Controls.Add(this.txtFixedFormRei);
+            this.Controls.Add(this.btnFixedFormDelete);
+            this.Controls.Add(this.lstFixedForm);
+            this.Controls.Add(this.btnFixedFormAdd);
+            this.Controls.Add(this.txtFixedForm);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.txtRirekiCount);
             this.Controls.Add(this.label1);
             this.KeyPreview = true;
@@ -110,7 +184,6 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.Load += new System.EventHandler(this.Main_Load);
             this.Shown += new System.EventHandler(this.Main_Shown);
-            this.SizeChanged += new System.EventHandler(this.Main_SizeChanged);
             this.contextMenuStripEnd.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -127,6 +200,13 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemEnd;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtRirekiCount;
+        private System.Windows.Forms.TextBox txtFixedForm;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnFixedFormAdd;
+        private System.Windows.Forms.ListBox lstFixedForm;
+        private System.Windows.Forms.Button btnFixedFormDelete;
+        private System.Windows.Forms.TextBox txtFixedFormRei;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSetting;
     }
 }
 

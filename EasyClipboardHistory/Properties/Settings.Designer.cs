@@ -12,7 +12,7 @@ namespace EasyClipboardHistory.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -32,6 +32,39 @@ namespace EasyClipboardHistory.Properties {
             }
             set {
                 this["RirekiCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection RirekiKeyData {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["RirekiKeyData"]));
+            }
+            set {
+                this["RirekiKeyData"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection RirekiTagData {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["RirekiTagData"]));
+            }
+            set {
+                this["RirekiTagData"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection RirekiFixedForm {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["RirekiFixedForm"]));
+            }
+            set {
+                this["RirekiFixedForm"] = value;
             }
         }
     }
