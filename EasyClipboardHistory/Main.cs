@@ -17,34 +17,42 @@ namespace EasyClipboardHistory
 {
     public partial class Main : Form
     {
-        private MyClipboardViewer viewer;
-
-        private IntPtr ForehWnd = IntPtr.Zero;
-
-        private bool IsEndFlag = false;
-        private bool isContextMenuStripOpen = false;
+        /// <summary>履歴を表示するPopupのショートカットキー</summary>
+        public Keys PopupShortcutKey = Keys.LShiftKey;
 
         /// <summary>表示する文字数</summary>
-    
         const int DISPLAY_LENGTH = 40;
 
         /// <summary>（定型時使用）改行コード</summary>
         const string KAIGYO_CODE = @"[\n]";
 
-        private bool isFixedFormExists = false;
+        /// <summary>ダブルクリックの判定（時間）</summary>
+        private int doubleClickTime = APIList.GetDoubleClickTime();
 
-        /// <summary>データ件数をマイナス</summary>
-        public int CountMinus {
-            get{
-                var returnValue = 0;
-                if (isFixedFormExists == true)
+        private MyClipboardViewer viewer;
+
+        /// <summary>前面のwindowのハンドル</summary>
+        private IntPtr ForehWnd = IntPtr.Zero;
+
+        private bool isEndFlag = false;
+        private bool isContextMenuStripOpen = false;
+
+        /// <summary>クリップボード履歴の件数</summary>
+        /// <remarks></remarks>
+        public int ClipboardHistoryCount
+        {
+            get
+            {
+                var returnValue = this.contextMenuStrip1.Items.Count;
+                if (itemFixedForm != null)
                 {
-                    returnValue += 1;
+                    returnValue -= 1;
                 }
                 return returnValue;
             }
         }
 
+        /// <summary>定型のメニュー</summary>
         ToolStripMenuItem itemFixedForm = null;
 
         public Main()
@@ -58,68 +66,81 @@ namespace EasyClipboardHistory
             viewer.ClipboardHandler += this.OnClipBoardChanged;
 
         }
-        DateTime prev_time = DateTime.Now;
+
+        DateTime prev_time = DateTime.MinValue;
+        DateTime up_time = DateTime.MinValue;
 
         private void keyboardHook1_KeyboardHooked(object sender, HongliangSoft.Utilities.Gui.KeyboardHookedEventArgs e)
         {
             //デバッグで実行するには　デバッグ　VS　ホスティングプロセスを有効にする　のチェックを外す
-
-            //左ShiftKey　ダブルクリック
-            if (e.UpDown == HongliangSoft.Utilities.Gui.KeyboardUpDown.Up && e.KeyCode == Keys.LShiftKey)
+            if (e.KeyCode == this.PopupShortcutKey)
             {
-                DateTime now = DateTime.Now;
-                TimeSpan ts = now - prev_time;
-                prev_time = now;
-
-                var doubleClickTime = APIList.GetDoubleClickTime();
-
-
-                if (ts.TotalMilliseconds <= doubleClickTime)
+                if (e.UpDown == HongliangSoft.Utilities.Gui.KeyboardUpDown.Down)
                 {
+                    up_time = DateTime.Now;
+                }
+                else if (e.UpDown == HongliangSoft.Utilities.Gui.KeyboardUpDown.Up)
+                {
+                    DateTime now = DateTime.Now;
 
-                    //すでに開いている場合は無視
-                    if (isContextMenuStripOpen == true)
+                    TimeSpan ts = now - up_time;
+                    //down upの時間(押しっぱなしの場合は無視する) doubleClickTimeの流用は微妙かも・・
+                    if (ts.TotalMilliseconds > doubleClickTime)
                     {
                         return;
                     }
 
-                    //フォーカス位置の取得
-                    ForehWnd = APIList.GetForegroundWindow();
-                    var current = APIList.GetCurrentThreadId();
-                    var target = APIList.GetWindowThreadProcessId(ForehWnd, IntPtr.Zero);
-                    Point p;
-                    APIList.AttachThreadInput(current, target, true);
-                    APIList.GetCaretPos(out p);
-                    var fWnd = APIList.GetFocus();
-                    APIList.ClientToScreen(fWnd,out p);
-                    APIList.AttachThreadInput(current, target, false);
+                    //左ShiftKey　ダブルクリック
+                    ts = now - prev_time;
+                    prev_time = now;
 
-                    //ダブルクリック処理
-                    var task = Task.Factory.StartNew(
-                        () =>
+                    if (ts.TotalMilliseconds <= doubleClickTime)
+                    {
+
+                        //すでに開いている場合は無視
+                        if (isContextMenuStripOpen == true)
                         {
-                            this.Invoke(
-                                    (MethodInvoker)(() =>
-                                    {
-                                        Thread.Sleep(200);
-                    
-                                        //APIList.SetTopMost(this.Handle);
-                                        this.contextMenuStrip1.Show(p.X, p.Y);
-
-                                        this.contextMenuStrip1.Focus();
-                                        APIList.SetForegroundWindow(this.contextMenuStrip1.Handle);
-
-                                        if (this.contextMenuStrip1.Items.Count > 0)
-                                        {
-                                            this.contextMenuStrip1.Items[0].Select();
-                                        }
-                                    }
-                                    )
-                                );
-
+                            return;
                         }
-                    );
 
+                        //フォーカス位置の取得
+                        ForehWnd = APIList.GetForegroundWindow();
+                        var current = APIList.GetCurrentThreadId();
+                        var target = APIList.GetWindowThreadProcessId(ForehWnd, IntPtr.Zero);
+                        Point p;
+                        APIList.AttachThreadInput(current, target, true);
+                        APIList.GetCaretPos(out p);
+                        var fWnd = APIList.GetFocus();
+                        APIList.ClientToScreen(fWnd, out p);
+                        APIList.AttachThreadInput(current, target, false);
+
+                        //ダブルクリック処理
+                        var task = Task.Factory.StartNew(
+                            () =>
+                            {
+                                this.Invoke(
+                                        (MethodInvoker)(() =>
+                                        {
+                                            Thread.Sleep(200);
+
+                                            //APIList.SetTopMost(this.Handle);
+                                            this.contextMenuStrip1.Show(p.X, p.Y);
+
+                                            this.contextMenuStrip1.Focus();
+                                            APIList.SetForegroundWindow(this.contextMenuStrip1.Handle);
+
+                                            if (this.contextMenuStrip1.Items.Count > 0)
+                                            {
+                                                this.contextMenuStrip1.Items[0].Select();
+                                            }
+                                        }
+                                        )
+                                    );
+
+                            }
+                        );
+
+                    }
                 }
             }
             else if (e.UpDown == HongliangSoft.Utilities.Gui.KeyboardUpDown.Up && e.KeyCode == Keys.Escape)
@@ -134,74 +155,65 @@ namespace EasyClipboardHistory
 
         private void Main_Load(object sender, EventArgs e)
         {
+
             this.notifyIcon1.Icon = this.Icon;
-            this.notifyIcon1.BalloonTipText = "（左）shiftキーダブルクリック\n選択でクリップボードにコピー（貼付）";
+            //this.notifyIcon1.BalloonTipText = "";
+            //this.notifyIcon1.ShowBalloonTip(500);
             this.notifyIcon1.BalloonTipTitle = "";
-            this.notifyIcon1.Text = "";
+            this.notifyIcon1.Text = "（左）shiftキーダブルクリック\n選択でクリップボードにコピー（貼付）";
 
-            this.notifyIcon1.ShowBalloonTip(500);
-
+            //【設定】履歴数
             this.txtRirekiCount.Text = Properties.Settings.Default.RirekiCount.ToString();
 
+            //【設定】定型
             txtFixedFormRei.BackColor = this.BackColor;
             txtFixedFormRei.Text = "改行は " + KAIGYO_CODE + " をセット";
 
-            //履歴データの復元
-            if (Properties.Settings.Default.RirekiKeyData == null)
+            if (Properties.Settings.Default.RirekiFixedForm == null)
             {
-                Properties.Settings.Default.RirekiKeyData = new System.Collections.Specialized.StringCollection();
+                Properties.Settings.Default.RirekiFixedForm = new System.Collections.Specialized.StringCollection();
             }
+            this.lstFixedForm.Items.Clear();
+            this.lstFixedForm.Items.AddRange(Properties.Settings.Default.RirekiFixedForm.OfType<object>().ToArray<object>());
 
-            if (Properties.Settings.Default.RirekiTagData == null)
-            {
-                Properties.Settings.Default.RirekiTagData = new System.Collections.Specialized.StringCollection();
-            }
+            //【設定】履歴の保存
+            //if (Properties.Settings.Default.RerekiSave == null)
+            //{
+            //Properties.Settings.Default.RerekiSave = true;
+            //}
+            this.chkClipboardHistorySave.Checked = Properties.Settings.Default.RerekiSave;
 
-            if (Properties.Settings.Default.RirekiKeyData.Count > 0) { 
-                this.contextMenuStrip1.Items.Clear();
-                for (var i = 0; i < Properties.Settings.Default.RirekiKeyData.Count ; i++)
-                {
-                    try
-                    {
-                        var item = new ToolStripMenuItem();
+            //popupmenuの初期化
+            initContextMenu(false);
 
-                        item.Text = Properties.Settings.Default.RirekiKeyData[i];
-                        item.Tag = Properties.Settings.Default.RirekiTagData[i];
-
-                        this.contextMenuStrip1.Items.Add(item);
-                    }
-                    catch { }
-                }
-            }
-
-            //定型のセット
-            saveFixedFormValue(true);
-          
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (IsEndFlag == false)
+            if (isEndFlag == false)
             {
                 e.Cancel = true;
                 this.Hide();
                 return;
             }
 
-            //履歴の保存
-            Properties.Settings.Default.RirekiKeyData.Clear();
-            Properties.Settings.Default.RirekiTagData.Clear();
-
-            for (var i = 0; i < this.contextMenuStrip1.Items.Count ; i++)
+            if (Properties.Settings.Default.RerekiSave == true)
             {
-                ToolStripItem item = this.contextMenuStrip1.Items[i];
-                if (item.Tag != null)
+                //履歴の保存
+                Properties.Settings.Default.RirekiKeyData.Clear();
+                Properties.Settings.Default.RirekiTagData.Clear();
+
+                for (var i = 0; i < this.contextMenuStrip1.Items.Count; i++)
                 {
-                    Properties.Settings.Default.RirekiKeyData.Add(item.Text);
-                    Properties.Settings.Default.RirekiTagData.Add(item.Tag.ToString());
+                    ToolStripItem item = this.contextMenuStrip1.Items[i];
+                    if (item.Tag != null)
+                    {
+                        Properties.Settings.Default.RirekiKeyData.Add(item.Text);
+                        Properties.Settings.Default.RirekiTagData.Add(item.Tag.ToString());
+                    }
                 }
             }
-            
+
             Properties.Settings.Default.Save();
         }
 
@@ -225,7 +237,7 @@ namespace EasyClipboardHistory
                     return;
                 }
 
-                if (this.contextMenuStrip1.Items.Count > 0 && this.contextMenuStrip1.Items[0].Tag !=null)
+                if (this.contextMenuStrip1.Items.Count > 0 && this.contextMenuStrip1.Items[0].Tag != null)
                 {
                     if ((String)(this.contextMenuStrip1.Items[0].Tag) == (String)clipText)
                     {
@@ -236,11 +248,14 @@ namespace EasyClipboardHistory
 
                 //履歴数を超えた場合の削除処理
                 int MaxCountData = Properties.Settings.Default.RirekiCount;
-                if (this.contextMenuStrip1.Items.Count - this.CountMinus > MaxCountData)
+                if (this.ClipboardHistoryCount > MaxCountData)
                 {
                     for (int index = this.contextMenuStrip1.Items.Count - 1; index >= MaxCountData; index--)
                     {
-                        this.contextMenuStrip1.Items.RemoveAt(index);
+                        if (this.contextMenuStrip1.Items[index].Tag != null)
+                        {
+                            this.contextMenuStrip1.Items.RemoveAt(index);
+                        }
                     }
                 }
             }
@@ -259,7 +274,7 @@ namespace EasyClipboardHistory
         //private bool IsClipCopy = false;
         private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            var tag =((ToolStripMenuItem)(e.ClickedItem)).Tag;
+            var tag = ((ToolStripMenuItem)(e.ClickedItem)).Tag;
             if (tag == null)
             {
                 return;
@@ -273,18 +288,26 @@ namespace EasyClipboardHistory
             //this.notifyIcon1.ShowBalloonTip(50);
         }
 
+        /// <summary>タスクトレイ（終了）</summary>
         private void toolStripMenuItemEnd_Click(object sender, EventArgs e)
         {
-            IsEndFlag = true;
+            isEndFlag = true;
             Application.Exit();
         }
 
+        /// <summary>タスクトレイ（設定）</summary>
         private void toolStripMenuItemSetting_Click(object sender, EventArgs e)
         {
             notifyIcon1_DoubleClick(sender, e);
         }
 
-        /// <summary>タスクトレイ</summary>
+        /// <summary>タスクトレイ（履歴クリア）</summary>
+        private void toolStripMenuClipboardHistoryClear_Click(object sender, EventArgs e)
+        {
+            initContextMenu(true);
+        }
+
+        /// <summary>タスクトレイダブルクリック</summary>
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
         {
             this.Opacity = 100;
@@ -307,12 +330,41 @@ namespace EasyClipboardHistory
                 }
             }
 
-            if (value <= 0)
+            //マイナスと100よりも大きい場合
+            if (value <= 0 || value > 100)
             {
                 Properties.Settings.Default.RirekiCount = 20;
             }
         }
 
+        private void chkClipboardHistorySave_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.RerekiSave = this.chkClipboardHistorySave.Checked;
+        }
+
+        private void btnFixedFormAdd_Click(object sender, EventArgs e)
+        {
+            if (this.txtFixedForm.Text.Equals("") == false)
+            {
+                for (var i = 0; i < this.lstFixedForm.Items.Count; i++)
+                {
+                    if (this.txtFixedForm.Text.Equals(this.lstFixedForm.Items[i].ToString()))
+                    {
+                        MessageBox.Show("既に追加済です。");
+                        return;
+                    }
+                }
+                this.lstFixedForm.Items.Add(this.txtFixedForm.Text);
+
+                saveFixedFormValue(true);
+            }
+        }
+
+        private void btnFixedFormDelete_Click(object sender, EventArgs e)
+        {
+            this.lstFixedForm.Items.Remove(this.lstFixedForm.SelectedItem);
+            saveFixedFormValue(true);
+        }
 
         private void setClipboard(string text)
         {
@@ -339,68 +391,34 @@ namespace EasyClipboardHistory
             }
         }
 
-        private void btnFixedFormAdd_Click(object sender, EventArgs e)
-        {
-            if (this.txtFixedForm.Text.Equals("") == false)
-            {
-                for (var i = 0; i < this.lstFixedForm.Items.Count; i++)
-                {
-                    if (this.txtFixedForm.Text.Equals(this.lstFixedForm.Items[i].ToString()))
-                    {
-                        MessageBox.Show("既に追加済です。");
-                        return;
-                    }
-                }
-                this.lstFixedForm.Items.Add(this.txtFixedForm.Text);
-                saveFixedFormValue(false);
-            }
-        }
-
-        private void btnFixedFormDelete_Click(object sender, EventArgs e)
-        {
-            this.lstFixedForm.Items.Remove(this.lstFixedForm.SelectedItem);
-            saveFixedFormValue(false);
-        }
-
-        private void saveFixedFormValue(bool firstFlag )
+        private void saveFixedFormValue(bool dataSyncFlag)
         {
 
-            //最初はListboxに追加するだけ
-            if (firstFlag == true)
-            {
-                if (Properties.Settings.Default.RirekiFixedForm == null)
-                {
-                    Properties.Settings.Default.RirekiFixedForm = new System.Collections.Specialized.StringCollection();
-                }
-                this.lstFixedForm.Items.Clear();
-                this.lstFixedForm.Items.AddRange(Properties.Settings.Default.RirekiFixedForm.OfType<object>().ToArray<object>());
-
-            }
-            else
+            if (dataSyncFlag)
             {
                 Properties.Settings.Default.RirekiFixedForm.Clear();
                 Properties.Settings.Default.RirekiFixedForm.AddRange(this.lstFixedForm.Items.OfType<string>().ToArray<string>());
             }
 
-
             if (Properties.Settings.Default.RirekiFixedForm.Count == 0)
             {
-                isFixedFormExists = false;
-
                 if (itemFixedForm != null)
                 {
                     this.contextMenuStrip1.Items.Remove(itemFixedForm);
                     itemFixedForm = null;
                 }
             }
-            else {
-                isFixedFormExists = true;
-
+            else
+            {
                 if (itemFixedForm == null)
                 {
                     itemFixedForm = new ToolStripMenuItem();
                     itemFixedForm.Text = "（定型）";
 
+                    this.contextMenuStrip1.Items.Add(itemFixedForm);
+                }
+                if (this.contextMenuStrip1.Items.Find(itemFixedForm.Text, false).Length == 0)
+                {
                     this.contextMenuStrip1.Items.Add(itemFixedForm);
                 }
 
@@ -411,7 +429,7 @@ namespace EasyClipboardHistory
                     var value = Properties.Settings.Default.RirekiFixedForm[i];
 
                     value = value.Replace(KAIGYO_CODE, "\n");
-                    
+
                     var item = getClipTextItem(value);
 
                     if (item == null)
@@ -433,6 +451,44 @@ namespace EasyClipboardHistory
                     itemFixedForm.DropDownItems.Add(item);
                 }
             }
+        }
+
+        /// <summary>popupメニューの初期化</summary>
+        /// <param name="initFlag">初期化する場合：true</param>
+        private void initContextMenu(bool initFlag)
+        {
+
+            //履歴データの復元
+            if (Properties.Settings.Default.RirekiKeyData == null || initFlag == true)
+            {
+                Properties.Settings.Default.RirekiKeyData = new System.Collections.Specialized.StringCollection();
+            }
+
+            if (Properties.Settings.Default.RirekiTagData == null || initFlag == true)
+            {
+                Properties.Settings.Default.RirekiTagData = new System.Collections.Specialized.StringCollection();
+            }
+
+            this.contextMenuStrip1.Items.Clear();
+            if (Properties.Settings.Default.RirekiKeyData.Count > 0)
+            {
+                for (var i = 0; i < Properties.Settings.Default.RirekiKeyData.Count; i++)
+                {
+                    try
+                    {
+                        var item = new ToolStripMenuItem();
+
+                        item.Text = Properties.Settings.Default.RirekiKeyData[i];
+                        item.Tag = Properties.Settings.Default.RirekiTagData[i];
+
+                        this.contextMenuStrip1.Items.Add(item);
+                    }
+                    catch { }
+                }
+            }
+
+            //定型のセット
+            saveFixedFormValue(false);
         }
 
         private ToolStripMenuItem getClipTextItem(string clipText)
@@ -457,7 +513,5 @@ namespace EasyClipboardHistory
 
             return item;
         }
-
- 
     }
 }

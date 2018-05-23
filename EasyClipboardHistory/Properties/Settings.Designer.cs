@@ -67,5 +67,17 @@ namespace EasyClipboardHistory.Properties {
                 this["RirekiFixedForm"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RerekiSave {
+            get {
+                return ((bool)(this["RerekiSave"]));
+            }
+            set {
+                this["RerekiSave"] = value;
+            }
+        }
     }
 }

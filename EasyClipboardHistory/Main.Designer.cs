@@ -33,6 +33,8 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStripEnd = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuClipboardHistoryClear = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemEnd = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.txtRirekiCount = new System.Windows.Forms.TextBox();
@@ -42,8 +44,8 @@
             this.lstFixedForm = new System.Windows.Forms.ListBox();
             this.btnFixedFormDelete = new System.Windows.Forms.Button();
             this.txtFixedFormRei = new System.Windows.Forms.TextBox();
-            this.toolStripMenuItemSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.keyboardHook1 = new HongliangSoft.Utilities.Gui.KeyboardHook();
+            this.chkClipboardHistorySave = new System.Windows.Forms.CheckBox();
             this.contextMenuStripEnd.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,15 +72,30 @@
             // contextMenuStripEnd
             // 
             this.contextMenuStripEnd.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuClipboardHistoryClear,
             this.toolStripMenuItemSetting,
             this.toolStripMenuItemEnd});
             this.contextMenuStripEnd.Name = "contextMenuStripEnd";
-            this.contextMenuStripEnd.Size = new System.Drawing.Size(153, 70);
+            this.contextMenuStripEnd.Size = new System.Drawing.Size(135, 70);
+            // 
+            // toolStripMenuClipboardHistoryClear
+            // 
+            this.toolStripMenuClipboardHistoryClear.Name = "toolStripMenuClipboardHistoryClear";
+            this.toolStripMenuClipboardHistoryClear.Size = new System.Drawing.Size(134, 22);
+            this.toolStripMenuClipboardHistoryClear.Text = "履歴のクリア";
+            this.toolStripMenuClipboardHistoryClear.Click += new System.EventHandler(this.toolStripMenuClipboardHistoryClear_Click);
+            // 
+            // toolStripMenuItemSetting
+            // 
+            this.toolStripMenuItemSetting.Name = "toolStripMenuItemSetting";
+            this.toolStripMenuItemSetting.Size = new System.Drawing.Size(134, 22);
+            this.toolStripMenuItemSetting.Text = "設定";
+            this.toolStripMenuItemSetting.Click += new System.EventHandler(this.toolStripMenuItemSetting_Click);
             // 
             // toolStripMenuItemEnd
             // 
             this.toolStripMenuItemEnd.Name = "toolStripMenuItemEnd";
-            this.toolStripMenuItemEnd.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemEnd.Size = new System.Drawing.Size(134, 22);
             this.toolStripMenuItemEnd.Text = "終了";
             this.toolStripMenuItemEnd.Click += new System.EventHandler(this.toolStripMenuItemEnd_Click);
             // 
@@ -101,14 +118,14 @@
             // 
             // txtFixedForm
             // 
-            this.txtFixedForm.Location = new System.Drawing.Point(92, 43);
+            this.txtFixedForm.Location = new System.Drawing.Point(92, 74);
             this.txtFixedForm.Name = "txtFixedForm";
             this.txtFixedForm.Size = new System.Drawing.Size(99, 19);
             this.txtFixedForm.TabIndex = 5;
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(12, 43);
+            this.label2.Location = new System.Drawing.Point(12, 74);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(74, 19);
             this.label2.TabIndex = 4;
@@ -117,7 +134,7 @@
             // 
             // btnFixedFormAdd
             // 
-            this.btnFixedFormAdd.Location = new System.Drawing.Point(197, 41);
+            this.btnFixedFormAdd.Location = new System.Drawing.Point(197, 72);
             this.btnFixedFormAdd.Name = "btnFixedFormAdd";
             this.btnFixedFormAdd.Size = new System.Drawing.Size(75, 23);
             this.btnFixedFormAdd.TabIndex = 6;
@@ -129,14 +146,14 @@
             // 
             this.lstFixedForm.FormattingEnabled = true;
             this.lstFixedForm.ItemHeight = 12;
-            this.lstFixedForm.Location = new System.Drawing.Point(14, 75);
+            this.lstFixedForm.Location = new System.Drawing.Point(14, 106);
             this.lstFixedForm.Name = "lstFixedForm";
             this.lstFixedForm.Size = new System.Drawing.Size(258, 88);
             this.lstFixedForm.TabIndex = 7;
             // 
             // btnFixedFormDelete
             // 
-            this.btnFixedFormDelete.Location = new System.Drawing.Point(14, 169);
+            this.btnFixedFormDelete.Location = new System.Drawing.Point(14, 200);
             this.btnFixedFormDelete.Name = "btnFixedFormDelete";
             this.btnFixedFormDelete.Size = new System.Drawing.Size(75, 23);
             this.btnFixedFormDelete.TabIndex = 8;
@@ -147,27 +164,32 @@
             // txtFixedFormRei
             // 
             this.txtFixedFormRei.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtFixedFormRei.Location = new System.Drawing.Point(95, 173);
+            this.txtFixedFormRei.Location = new System.Drawing.Point(95, 204);
             this.txtFixedFormRei.Name = "txtFixedFormRei";
             this.txtFixedFormRei.Size = new System.Drawing.Size(99, 12);
             this.txtFixedFormRei.TabIndex = 9;
-            // 
-            // toolStripMenuItemSetting
-            // 
-            this.toolStripMenuItemSetting.Name = "toolStripMenuItemSetting";
-            this.toolStripMenuItemSetting.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItemSetting.Text = "設定";
-            this.toolStripMenuItemSetting.Click += new System.EventHandler(this.toolStripMenuItemSetting_Click);
             // 
             // keyboardHook1
             // 
             this.keyboardHook1.KeyboardHooked += new HongliangSoft.Utilities.Gui.KeyboardHookedEventHandler(this.keyboardHook1_KeyboardHooked);
             // 
+            // chkClipboardHistorySave
+            // 
+            this.chkClipboardHistorySave.AutoSize = true;
+            this.chkClipboardHistorySave.Location = new System.Drawing.Point(22, 39);
+            this.chkClipboardHistorySave.Name = "chkClipboardHistorySave";
+            this.chkClipboardHistorySave.Size = new System.Drawing.Size(100, 16);
+            this.chkClipboardHistorySave.TabIndex = 10;
+            this.chkClipboardHistorySave.Text = "履歴を保存する";
+            this.chkClipboardHistorySave.UseVisualStyleBackColor = true;
+            this.chkClipboardHistorySave.Click += new System.EventHandler(this.chkClipboardHistorySave_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
+            this.ClientSize = new System.Drawing.Size(284, 241);
+            this.Controls.Add(this.chkClipboardHistorySave);
             this.Controls.Add(this.txtFixedFormRei);
             this.Controls.Add(this.btnFixedFormDelete);
             this.Controls.Add(this.lstFixedForm);
@@ -207,6 +229,8 @@
         private System.Windows.Forms.Button btnFixedFormDelete;
         private System.Windows.Forms.TextBox txtFixedFormRei;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSetting;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuClipboardHistoryClear;
+        private System.Windows.Forms.CheckBox chkClipboardHistorySave;
     }
 }
 
