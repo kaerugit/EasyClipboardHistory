@@ -79,5 +79,17 @@ namespace EasyClipboardHistory.Properties {
                 this["RerekiSave"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int ALLRirekiCount {
+            get {
+                return ((int)(this["ALLRirekiCount"]));
+            }
+            set {
+                this["ALLRirekiCount"] = value;
+            }
+        }
     }
 }

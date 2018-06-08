@@ -55,6 +55,9 @@ namespace EasyClipboardHistory
         /// <summary>定型のメニュー</summary>
         ToolStripMenuItem itemFixedForm = null;
 
+        List<string> ALLClipData = new List<string>();
+        private ToolTip toolTipResult;
+
         public Main()
         {
             //クリップボード
@@ -64,6 +67,8 @@ namespace EasyClipboardHistory
 
             //クリップボード イベントハンドラを登録
             viewer.ClipboardHandler += this.OnClipBoardChanged;
+
+            toolTipResult = new ToolTip();
 
         }
 
@@ -164,6 +169,7 @@ namespace EasyClipboardHistory
 
             //【設定】履歴数
             this.txtRirekiCount.Text = Properties.Settings.Default.RirekiCount.ToString();
+            this.txtAllRirekiCount.Text = Properties.Settings.Default.ALLRirekiCount.ToString();
 
             //【設定】定型
             txtFixedFormRei.BackColor = this.BackColor;
@@ -258,6 +264,21 @@ namespace EasyClipboardHistory
                         }
                     }
                 }
+
+                //検索用の履歴
+                int MaxSerchCountData = Properties.Settings.Default.ALLRirekiCount;
+
+                if (this.ALLClipData.Contains(clipText) == false)
+                {
+                    this.ALLClipData.Insert(0, clipText);
+                    if (this.ALLClipData.Count > MaxSerchCountData)
+                    {
+                        for (int index = this.ALLClipData.Count - 1; index >= MaxSerchCountData; index--)
+                        {
+                            this.ALLClipData.RemoveAt(index);
+                        }
+                    }
+                }
             }
         }
 
@@ -337,6 +358,24 @@ namespace EasyClipboardHistory
             }
         }
 
+        private void txtAllRirekiCount_TextChanged(object sender, EventArgs e)
+        {
+            int value = int.MinValue;
+            if (this.txtAllRirekiCount.Text.Length > 0)
+            {
+                if (int.TryParse(this.txtAllRirekiCount.Text, out value))
+                {
+                    Properties.Settings.Default.ALLRirekiCount = value;
+                }
+            }
+
+            //マイナスと100よりも大きい場合
+            if (value <= 0 || value > 500)
+            {
+                Properties.Settings.Default.ALLRirekiCount = 100;
+            }
+        }
+
         private void chkClipboardHistorySave_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.RerekiSave = this.chkClipboardHistorySave.Checked;
@@ -391,6 +430,8 @@ namespace EasyClipboardHistory
             }
         }
 
+        /// <summary>定型データの保存</summary>
+        /// <param name="dataSyncFlag"></param>
         private void saveFixedFormValue(bool dataSyncFlag)
         {
 
@@ -458,6 +499,11 @@ namespace EasyClipboardHistory
         private void initContextMenu(bool initFlag)
         {
 
+            if (initFlag == true)
+            {
+                this.ALLClipData.Clear();
+            }
+
             //履歴データの復元
             if (Properties.Settings.Default.RirekiKeyData == null || initFlag == true)
             {
@@ -512,6 +558,51 @@ namespace EasyClipboardHistory
             item.Tag = clipText;
 
             return item;
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            this.lstResult.Items.Clear();
+
+            this.lstResult.Items.AddRange(
+                this.ALLClipData.Where(
+                (value) =>
+                {
+                    if (value.ToLower().Contains(this.txtSearch.Text.ToLower()))
+                    {
+                        return true;
+                    }
+                    return false;
+                }).ToArray()
+            );
+        }
+
+        private void btnResultCopy_Click(object sender, EventArgs e)
+        {
+            if (this.lstResult.SelectedItem != null)
+            {
+                setClipboard(this.lstResult.SelectedItem.ToString());
+                MessageBox.Show("クリップボードにコピーしました。");
+            }
+            else
+            {
+                MessageBox.Show("データを選択してください。");
+            }
+        }
+
+        private void lstResult_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //ツールチップの表示
+            if (this.lstResult.SelectedItem != null)
+            {
+                var dispText = this.lstResult.SelectedItem.ToString();
+                //1000文字以上は...表示
+                if (dispText.Length > 1000)
+                {
+                    dispText = dispText.Substring(0, 1000) + "...";
+                }
+                toolTipResult.Show(dispText, this.lstResult, 2000); //2秒表示
+            }
         }
     }
 }
