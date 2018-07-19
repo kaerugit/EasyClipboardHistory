@@ -109,9 +109,9 @@ namespace EasyClipboardHistory
                         }
 
                         //フォーカス位置の取得
-                        ForehWnd = APIList.GetForegroundWindow();
+                        this.ForehWnd = APIList.GetForegroundWindow();
                         var current = APIList.GetCurrentThreadId();
-                        var target = APIList.GetWindowThreadProcessId(ForehWnd, IntPtr.Zero);
+                        var target = APIList.GetWindowThreadProcessId(this.ForehWnd, IntPtr.Zero);
                         Point p;
                         APIList.AttachThreadInput(current, target, true);
                         APIList.GetCaretPos(out p);
@@ -409,11 +409,11 @@ namespace EasyClipboardHistory
         {
             System.Windows.Forms.Clipboard.SetText(text);
 
-            if (ForehWnd != IntPtr.Zero)
+            if (this.ForehWnd != IntPtr.Zero)
             {
                 this.contextMenuStrip1.Hide();
 
-                APIList.SetActiveWindow(ForehWnd);
+                APIList.SetActiveWindow(this.ForehWnd);
                 Thread.Sleep(50);
 
                 //貼付処理
@@ -581,7 +581,7 @@ namespace EasyClipboardHistory
         {
             if (this.lstResult.SelectedItem != null)
             {
-                setClipboard(this.lstResult.SelectedItem.ToString());
+                System.Windows.Forms.Clipboard.SetText(this.lstResult.SelectedItem.ToString());
                 MessageBox.Show("クリップボードにコピーしました。");
             }
             else

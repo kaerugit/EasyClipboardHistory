@@ -21,6 +21,7 @@ namespace ClipboardViewer
         }
     }
 
+    // http://www.atmarkit.co.jp/fdotnet/dotnettips/848cbviewer/cbviewer.html 参照（というかコピペ）
     public delegate void cbEventHandler(
                             object sender, ClipboardEventArgs ev);
 
