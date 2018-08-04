@@ -20,6 +20,10 @@ namespace EasyClipboardHistory
         /// <summary>履歴を表示するPopupのショートカットキー</summary>
         public Keys PopupShortcutKey = Keys.LShiftKey;
 
+        /// <summary>履歴を表示するPopupのショートカットキー(sub)</summary>
+        /// <remarks>必要ない場合はnullをセット</remarks>
+        public Keys? PopupShortcutKeySub = Keys.RShiftKey;
+
         /// <summary>表示する文字数</summary>
         const int DISPLAY_LENGTH = 40;
 
@@ -78,7 +82,9 @@ namespace EasyClipboardHistory
         private void keyboardHook1_KeyboardHooked(object sender, HongliangSoft.Utilities.Gui.KeyboardHookedEventArgs e)
         {
             //デバッグで実行するには　デバッグ　VS　ホスティングプロセスを有効にする　のチェックを外す
-            if (e.KeyCode == this.PopupShortcutKey)
+            if (e.KeyCode == this.PopupShortcutKey ||
+                (this.PopupShortcutKeySub.HasValue == true && e.KeyCode == this.PopupShortcutKeySub.Value)
+            )
             {
                 if (e.UpDown == HongliangSoft.Utilities.Gui.KeyboardUpDown.Down)
                 {
@@ -165,7 +171,7 @@ namespace EasyClipboardHistory
             //this.notifyIcon1.BalloonTipText = "";
             //this.notifyIcon1.ShowBalloonTip(500);
             this.notifyIcon1.BalloonTipTitle = "";
-            this.notifyIcon1.Text = "（左）shiftキーダブルクリック\n選択でクリップボードにコピー（貼付）";
+            this.notifyIcon1.Text = "shiftキーダブルクリック\n選択でクリップボードにコピー（貼付）";
 
             //【設定】履歴数
             this.txtRirekiCount.Text = Properties.Settings.Default.RirekiCount.ToString();

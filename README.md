@@ -11,3 +11,8 @@ Visual Studio 2017 Community
 キーのフックはこちらからのプロジェクトを参考にさせて頂きました
 https://github.com/come25136/Function-Key-Setting
 
+
+# 改造メモ
+デフォルトの起動はshiftキーをダブルクリック
+変更したい場合は、PopupShortcutKeyでソース内を検索してください。
+
