@@ -162,6 +162,11 @@ namespace EasyClipboardHistory
                     this.contextMenuStrip1.Close();
                 }
             }
+            else
+            {
+                //ダブルクリックの間に違うキーが押された場合は一旦キャンセル
+                up_time = DateTime.MinValue;
+            }
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -240,7 +245,24 @@ namespace EasyClipboardHistory
 
             if (Clipboard.ContainsText(System.Windows.Forms.TextDataFormat.Text))
             {
-                var clipText = (String)System.Windows.Forms.Clipboard.GetData(System.Windows.Forms.DataFormats.StringFormat);
+                var clipText = "";
+                clipText = (String)System.Windows.Forms.Clipboard.GetData(System.Windows.Forms.DataFormats.StringFormat);
+
+                using (MemoryStream ms = (MemoryStream)System.Windows.Forms.Clipboard.GetData("Csv"))
+                {
+                    //★特別処理★Excelからのコピー (改行がある場合ダブルコーテーションが追加されるので削除する)
+                    //こちらの処理を入れない場合は一旦wordに貼り付けてコピー
+                    if (ms != null)
+                    {
+                        if (clipText.Contains("\n") && clipText.StartsWith(@""""))
+                        {
+                            clipText = clipText.Replace(@"""""", "\t¶\t");
+                            clipText = clipText.Replace(@"""", "");
+                            clipText = clipText.Replace("\t¶\t", @"""");
+                        }
+                    }
+
+                }
 
                 var item = getClipTextItem(clipText);
 
