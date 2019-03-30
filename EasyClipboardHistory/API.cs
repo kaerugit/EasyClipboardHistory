@@ -178,6 +178,9 @@ namespace API
         [DllImport("user32.dll")]
         public static extern uint keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 
+        [DllImport("user32.dll")]
+        public static extern bool GetCursorPos(out Point lpPoint);
+
     }
 
 

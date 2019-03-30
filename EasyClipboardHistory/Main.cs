@@ -2,13 +2,10 @@
 using ClipboardViewer;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -200,6 +197,8 @@ namespace EasyClipboardHistory
             //}
             this.chkClipboardHistorySave.Checked = Properties.Settings.Default.RerekiSave;
 
+            this.chkSameWordAlert.Checked = Properties.Settings.Default.SameWordAlert;
+
             //popupmenuの初期化
             initContextMenu(false);
 
@@ -240,6 +239,7 @@ namespace EasyClipboardHistory
             this.Opacity = 0;
         }
 
+        private Point oldPoint = new Point(0,0);
         private void OnClipBoardChanged(object sender, ClipboardEventArgs args)
         {
 
@@ -271,13 +271,42 @@ namespace EasyClipboardHistory
                     return;
                 }
 
-                if (this.contextMenuStrip1.Items.Count > 0 && this.contextMenuStrip1.Items[0].Tag != null)
+                Point p = new Point(0, 0);
+
+                APIList.GetCursorPos(out p);
+
+                try
                 {
-                    if ((String)(this.contextMenuStrip1.Items[0].Tag) == (String)clipText)
+                    if (this.contextMenuStrip1.Items.Count > 0 && this.contextMenuStrip1.Items[0].Tag != null)
                     {
-                        return;
+                        if ((String)(this.contextMenuStrip1.Items[0].Tag) == (String)clipText)
+                        {
+
+                            if (Properties.Settings.Default.SameWordAlert == true)
+                            {
+
+                                //キャレットの位置が違ったら（マウスの位置で判定しているのでカーソル移動の時は無視される（公認バグ？））
+                                if ((oldPoint.X != p.X || oldPoint.Y != p.Y))
+                                {
+
+                                    this.Activate();
+                                    MessageBox.Show("同じデータが追加されました。");
+                                    //this.notifyIcon1.BalloonTipText = "同じデータが追加されました。";
+                                    //this.notifyIcon1.ShowBalloonTip(100);
+
+                                }
+                            }
+
+                            return;
+                        }
                     }
+
                 }
+                finally
+                {
+                    oldPoint = p;
+                }
+                
                 this.contextMenuStrip1.Items.Insert(0, item);
 
                 //履歴数を超えた場合の削除処理
@@ -408,6 +437,12 @@ namespace EasyClipboardHistory
         {
             Properties.Settings.Default.RerekiSave = this.chkClipboardHistorySave.Checked;
         }
+
+        private void chkSameWordAlert_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.SameWordAlert = this.chkSameWordAlert.Checked ;
+        }
+
 
         private void btnFixedFormAdd_Click(object sender, EventArgs e)
         {
@@ -632,5 +667,6 @@ namespace EasyClipboardHistory
                 toolTipResult.Show(dispText, this.lstResult, 2000); //2秒表示
             }
         }
+
     }
 }

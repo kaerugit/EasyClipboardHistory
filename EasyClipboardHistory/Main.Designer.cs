@@ -56,6 +56,7 @@
             this.btnSearch = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.chkSameWordAlert = new System.Windows.Forms.CheckBox();
             this.keyboardHook1 = new HongliangSoft.Utilities.Gui.KeyboardHook();
             this.contextMenuStripEnd.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -121,11 +122,12 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(319, 318);
+            this.tabControl1.Size = new System.Drawing.Size(319, 345);
             this.tabControl1.TabIndex = 11;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.chkSameWordAlert);
             this.tabPage1.Controls.Add(this.label5);
             this.tabPage1.Controls.Add(this.txtAllRirekiCount);
             this.tabPage1.Controls.Add(this.label4);
@@ -141,19 +143,19 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(311, 292);
+            this.tabPage1.Size = new System.Drawing.Size(311, 319);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "設定";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
-            this.label5.Location = new System.Drawing.Point(125, 86);
+            this.label5.Location = new System.Drawing.Point(29, 87);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(161, 19);
             this.label5.TabIndex = 22;
             this.label5.Text = "※履歴検索タブで検索可能";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // txtAllRirekiCount
             // 
@@ -165,35 +167,35 @@
             // 
             // label4
             // 
-            this.label4.Location = new System.Drawing.Point(20, 64);
+            this.label4.Location = new System.Drawing.Point(28, 64);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(161, 19);
+            this.label4.Size = new System.Drawing.Size(153, 19);
             this.label4.TabIndex = 20;
             this.label4.Text = "履歴検索用保存件数";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // chkClipboardHistorySave
             // 
             this.chkClipboardHistorySave.AutoSize = true;
-            this.chkClipboardHistorySave.Location = new System.Drawing.Point(62, 38);
+            this.chkClipboardHistorySave.Location = new System.Drawing.Point(30, 39);
             this.chkClipboardHistorySave.Name = "chkClipboardHistorySave";
-            this.chkClipboardHistorySave.Size = new System.Drawing.Size(100, 16);
+            this.chkClipboardHistorySave.Size = new System.Drawing.Size(136, 16);
             this.chkClipboardHistorySave.TabIndex = 19;
-            this.chkClipboardHistorySave.Text = "履歴を保存する";
+            this.chkClipboardHistorySave.Text = "終了時履歴を保存する";
             this.chkClipboardHistorySave.UseVisualStyleBackColor = true;
             this.chkClipboardHistorySave.Click += new System.EventHandler(this.chkClipboardHistorySave_Click);
             // 
             // txtFixedFormRei
             // 
             this.txtFixedFormRei.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtFixedFormRei.Location = new System.Drawing.Point(109, 258);
+            this.txtFixedFormRei.Location = new System.Drawing.Point(109, 282);
             this.txtFixedFormRei.Name = "txtFixedFormRei";
             this.txtFixedFormRei.Size = new System.Drawing.Size(99, 12);
             this.txtFixedFormRei.TabIndex = 18;
             // 
             // btnFixedFormDelete
             // 
-            this.btnFixedFormDelete.Location = new System.Drawing.Point(28, 254);
+            this.btnFixedFormDelete.Location = new System.Drawing.Point(28, 278);
             this.btnFixedFormDelete.Name = "btnFixedFormDelete";
             this.btnFixedFormDelete.Size = new System.Drawing.Size(75, 23);
             this.btnFixedFormDelete.TabIndex = 17;
@@ -205,14 +207,14 @@
             // 
             this.lstFixedForm.FormattingEnabled = true;
             this.lstFixedForm.ItemHeight = 12;
-            this.lstFixedForm.Location = new System.Drawing.Point(28, 160);
+            this.lstFixedForm.Location = new System.Drawing.Point(28, 184);
             this.lstFixedForm.Name = "lstFixedForm";
             this.lstFixedForm.Size = new System.Drawing.Size(258, 88);
             this.lstFixedForm.TabIndex = 16;
             // 
             // btnFixedFormAdd
             // 
-            this.btnFixedFormAdd.Location = new System.Drawing.Point(211, 126);
+            this.btnFixedFormAdd.Location = new System.Drawing.Point(211, 150);
             this.btnFixedFormAdd.Name = "btnFixedFormAdd";
             this.btnFixedFormAdd.Size = new System.Drawing.Size(75, 23);
             this.btnFixedFormAdd.TabIndex = 15;
@@ -222,14 +224,14 @@
             // 
             // txtFixedForm
             // 
-            this.txtFixedForm.Location = new System.Drawing.Point(106, 128);
+            this.txtFixedForm.Location = new System.Drawing.Point(106, 152);
             this.txtFixedForm.Name = "txtFixedForm";
             this.txtFixedForm.Size = new System.Drawing.Size(99, 19);
             this.txtFixedForm.TabIndex = 14;
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(26, 128);
+            this.label2.Location = new System.Drawing.Point(26, 152);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(74, 19);
             this.label2.TabIndex = 13;
@@ -246,12 +248,12 @@
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(20, 14);
+            this.label1.Location = new System.Drawing.Point(28, 14);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(161, 19);
+            this.label1.Size = new System.Drawing.Size(153, 19);
             this.label1.TabIndex = 11;
             this.label1.Text = "履歴保存件数";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // tabPage2
             // 
@@ -263,7 +265,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(311, 292);
+            this.tabPage2.Size = new System.Drawing.Size(311, 319);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "履歴検索";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -314,6 +316,17 @@
             this.label3.Text = "検索ワード";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // chkSameWordAlert
+            // 
+            this.chkSameWordAlert.AutoSize = true;
+            this.chkSameWordAlert.Location = new System.Drawing.Point(31, 117);
+            this.chkSameWordAlert.Name = "chkSameWordAlert";
+            this.chkSameWordAlert.Size = new System.Drawing.Size(150, 16);
+            this.chkSameWordAlert.TabIndex = 23;
+            this.chkSameWordAlert.Text = "データが同じ場合警告する";
+            this.chkSameWordAlert.UseVisualStyleBackColor = true;
+            this.chkSameWordAlert.CheckedChanged += new System.EventHandler(this.chkSameWordAlert_CheckedChanged);
+            // 
             // keyboardHook1
             // 
             this.keyboardHook1.KeyboardHooked += new HongliangSoft.Utilities.Gui.KeyboardHookedEventHandler(this.keyboardHook1_KeyboardHooked);
@@ -322,7 +335,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(319, 318);
+            this.ClientSize = new System.Drawing.Size(319, 345);
             this.Controls.Add(this.tabControl1);
             this.KeyPreview = true;
             this.MaximizeBox = false;
@@ -372,6 +385,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtAllRirekiCount;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox chkSameWordAlert;
     }
 }
 
